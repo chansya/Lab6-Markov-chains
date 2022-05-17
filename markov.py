@@ -10,9 +10,9 @@ def open_and_read_file(file_path):
     the file's contents as one string of text.
     """
 
-    # your code goes here
+    contents = open(file_path).read()
 
-    return 'Contents of your file as one long string'
+    return contents
 
 
 def make_chains(text_string):
@@ -42,7 +42,13 @@ def make_chains(text_string):
 
     chains = {}
 
-    # your code goes here
+    words = text_string.split()
+
+    for i in range(len(words)-2):
+        if (words[i], words[i+1]) not in chains:
+            chains[(words[i], words[i+1])] = [words[i+2]]
+        else:
+            chains[(words[i], words[i+1])].append(words[i+2])
 
     return chains
 
@@ -51,8 +57,23 @@ def make_text(chains):
     """Return text from chains."""
 
     words = []
+    # use choice method to generate a random word-pair as starting words
+    starting_words = choice(list(chains.keys()))
 
-    # your code goes here
+    words.extend(starting_words)
+
+    while True:
+        # following word would be a random word from the value list
+        try:
+
+            following_word = choice(chains[starting_words])
+
+            words.append(following_word)
+
+            starting_words = (words[-2], words[-1])
+
+        except KeyError:
+            break
 
     return ' '.join(words)
 
