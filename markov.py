@@ -15,7 +15,7 @@ def open_and_read_file(file_path):
     return contents
 
 
-def make_chains(text_string):
+def make_chains(text_string, n):
     """Take input text as string; return dictionary of Markov chains.
 
     A chain will be a key that consists of a tuple of (word1, word2)
@@ -44,33 +44,37 @@ def make_chains(text_string):
 
     words = text_string.split()
 
-    for i in range(len(words)-2):
-        if (words[i], words[i+1]) not in chains:
-            chains[(words[i], words[i+1])] = [words[i+2]]
+    for i in range(len(words)-n):
+        key = tuple(words[i:i+n])
+        if key not in chains:
+            chains[key] = [words[i+n]]
         else:
-            chains[(words[i], words[i+1])].append(words[i+2])
+            chains[key].append(words[i+n])
 
     return chains
 
 
-def make_text(chains):
+def make_text(chains, n):
     """Return text from chains."""
 
     words = []
     # use choice method to generate a random word-pair as starting words
-    starting_words = choice(list(chains.keys()))
+    while True:
+        starting_words = choice(list(chains.keys()))
+        if starting_words[0][0].isupper():
+            break
 
     words.extend(starting_words)
 
     while True:
-        # following word would be a random word from the value list
-        try:
 
+        try:
+            # following word would be a random word from the value list
             following_word = choice(chains[starting_words])
 
             words.append(following_word)
 
-            starting_words = (words[-2], words[-1])
+            starting_words = tuple(words[-n:])
 
         except KeyError:
             break
@@ -78,15 +82,15 @@ def make_text(chains):
     return ' '.join(words)
 
 
-input_path = 'green-eggs.txt'
+input_path = 'dr-seuss.txt'
 
 # Open the file and turn it into one long string
 input_text = open_and_read_file(input_path)
 
 # Get a Markov chain
-chains = make_chains(input_text)
+chains = make_chains(input_text, 2)
 
 # Produce random text
-random_text = make_text(chains)
+random_text = make_text(chains, 2)
 
 print(random_text)
